@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  projects  Project[]
+  createdAt DateTime @default(now())
+}
+
+model Project {
+  id        String   @id @default(cuid())
+  name      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  documents Document[]
+  chats     Conversation[]
+  createdAt DateTime @default(now())
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  filename  String
+
+  projectId String
+  project   Project @relation(fileds: [projectId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  title     String?
+
+  projectId String
+  project   Project @relation(fileds: [projectId], references: [id])
+
+  messages: Message[]
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  role      String
+  content   String
+
+  conversationId    String
+  conversation      Conversation @relation(fileds: [conversationId], references: [id])
+
+  createdAt DateTime @default(now())
+}
